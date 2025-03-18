@@ -1,4 +1,13 @@
-
 # LICENSE
 
-.git
+# common dependencies and ignore files
+__pycache__
+node_modules
+.env
+.venv
+*.log
+*.db
+
+# IDE files
+.vscode
+.idea
