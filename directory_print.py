@@ -109,7 +109,7 @@ if __name__ == "__main__":
     parser.add_argument('--ignore', type=str, help="Comma-separated list of additional files or directories to ignore. e.g. '--ignore=.env,.git'")
     parser.add_argument('--use_gitignore', type=str, default="True", choices=['True', 'False'],
                         help="Specify whether to use the .gitignore file (default: True). e.g. '--use_gitignore=False'")
-    parser.add_argument('--show_ignored_dirs', action='store_true', help="Show ignored directories (default: False)")
+    parser.add_argument('--show_ignored_dirs', action='store_true', help="Show ignored directories (default: False). Usage: '--show_ignored_dirs'")
 
     # parse
     args = parser.parse_args()
