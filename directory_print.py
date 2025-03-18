@@ -1,6 +1,7 @@
 import os
-from pathlib import Path
 import fnmatch
+import argparse
+from pathlib import Path
 
 def load_gitignore_patterns(target_dir):
     """
@@ -55,5 +56,11 @@ def main(target_dir):
     print_directory_structure(target_dir, ignore_patterns)
 
 if __name__ == "__main__":
-    target_directory = input("Enter the target directory: ").strip()
-    main(target_directory)
+    # setup command line arguments
+    parser = argparse.ArgumentParser(description="Print the directory structure while ignoring files and directories specified in .gitignore")
+    parser.add_argument('target_dir', metavar='TARGET_DIR', type=str, help="The target directory to scan")
+
+    # parse args
+    args = parser.parse_args()
+    
+    main(args.target_dir)
