@@ -4,20 +4,20 @@ import argparse
 from pathlib import Path
 
 
-def load_gitignore_patterns(target_dir):
+def load_gitignore_patterns(target_dir, use_gitignore):
     """
     Load and parse .gitignore from the target directory.
     """
     gitignore_file = Path(target_dir) / ".gitignore"
     ignore_patterns = []
 
-    if gitignore_file.exists():
+    if gitignore_file.exists() and use_gitignore:
         with open(gitignore_file, 'r') as file:
             for line in file:
                 line = line.strip()
                 if line and not line.startswith('#'): # ignore blank lines and comments
                     ignore_patterns.append(line)
-    
+
     return ignore_patterns
 
 
@@ -32,7 +32,6 @@ def is_ignored(file_path, ignore_patterns):
         if pattern.endswith('/') and file_path.is_dir():
             if fnmatch.fnmatch(file_path.name + '/', pattern):
                 return True
-        
     return False
 
 
@@ -77,8 +76,8 @@ def print_directory_structure_tree(target_dir, ignore_patterns, parent_dir='', p
             print_directory_structure_tree(item, ignore_patterns, parent_dir=os.path.join(parent_dir, str(relative_item)), prefix=new_prefix)
 
 
-def main(target_dir, output_format, manual_ignore_patterns):
-    ignore_patterns = load_gitignore_patterns(target_dir)
+def main(target_dir, output_format, manual_ignore_patterns, use_gitignore):
+    ignore_patterns = load_gitignore_patterns(target_dir, use_gitignore)
 
     if manual_ignore_patterns:
         ignore_patterns.extend(manual_ignore_patterns)
@@ -95,12 +94,16 @@ if __name__ == "__main__":
     parser.add_argument('target_dir', metavar='TARGET_DIR', type=str, help="The target directory to scan")
     parser.add_argument('--output', choices=['list', 'tree'], default='tree', help="Specify the output format: 'list' or 'tree' (default: 'tree')")
     parser.add_argument('--ignore', type=str, help="Comma-separated list of additional files or directories to ignore. e.g. '--ignore=.env,.git'")
+    parser.add_argument('--use_gitignore', type=str, default="True", choices=['True', 'False'],
+                        help="Specify whether to use the .gitignore file (default: True). e.g. '--use_gitignore=False'")
 
     # parse
     args = parser.parse_args()
+    
+    use_gitignore = False if args.use_gitignore == 'False' else True
+
     manual_ignore_patterns = []
     if args.ignore:
         manual_ignore_patterns = [pattern.strip() for pattern in args.ignore.split(',')]
 
-    
-    main(args.target_dir, args.output, manual_ignore_patterns)
+    main(args.target_dir, args.output, manual_ignore_patterns, use_gitignore)
