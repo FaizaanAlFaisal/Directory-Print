@@ -106,4 +106,19 @@ if __name__ == "__main__":
     if args.ignore:
         manual_ignore_patterns = [pattern.strip() for pattern in args.ignore.split(',')]
 
+    if not os.path.exists(args.target_dir):
+       raise ValueError(f"Error: {args.target_dir} does not exist.")
+    
+    if not os.path.isdir(args.target_dir):
+        raise ValueError(f"Error: {args.target_dir} is not a directory.")
+    
+    if args.output != "list" and args.output != "tree":
+        raise ValueError(f"Error: Invalid output format '{args.output}'. Please specify 'list' or 'tree'.") 
+
+    print(f"Target Directory: {args.target_dir}")
+    print(f"Output Format: {args.output}")
+    print(f"Additional Ignored Files: {args.ignore}")
+    print(f"Using .gitignore: {args.use_gitignore}")
+    print("\n\n")
+
     main(args.target_dir, args.output, manual_ignore_patterns, use_gitignore)
