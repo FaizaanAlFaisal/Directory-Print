@@ -77,8 +77,11 @@ def print_directory_structure_tree(target_dir, ignore_patterns, parent_dir='', p
             print_directory_structure_tree(item, ignore_patterns, parent_dir=os.path.join(parent_dir, str(relative_item)), prefix=new_prefix)
 
 
-def main(target_dir, output_format):
+def main(target_dir, output_format, manual_ignore_patterns):
     ignore_patterns = load_gitignore_patterns(target_dir)
+
+    if manual_ignore_patterns:
+        ignore_patterns.extend(manual_ignore_patterns)
     
     if output_format == "list":
         print_directory_structure_list(target_dir, ignore_patterns)
@@ -91,8 +94,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Print the directory structure while ignoring files and directories specified in .gitignore")
     parser.add_argument('target_dir', metavar='TARGET_DIR', type=str, help="The target directory to scan")
     parser.add_argument('--output', choices=['list', 'tree'], default='tree', help="Specify the output format: 'list' or 'tree' (default: 'tree')")
-    
+    parser.add_argument('--ignore', type=str, help="Comma-separated list of additional files or directories to ignore. e.g. '--ignore=.env,.git'")
+
     # parse
     args = parser.parse_args()
+    manual_ignore_patterns = []
+    if args.ignore:
+        manual_ignore_patterns = [pattern.strip() for pattern in args.ignore.split(',')]
+
     
-    main(args.target_dir, args.output)
+    main(args.target_dir, args.output, manual_ignore_patterns)
