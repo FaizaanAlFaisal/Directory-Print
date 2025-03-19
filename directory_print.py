@@ -63,8 +63,12 @@ def print_directory_structure_tree(target_dir, ignore_patterns, parent_dir='', p
     Print directory structure as an ASCII tree, ignoring files and dirs based on .gitignore.
     """
     target_dir = Path(target_dir)
+    
+    items = list(target_dir.iterdir())
+    visible_items = [item for item in items if (not is_ignored(item, ignore_patterns) or (item.is_dir() and show_ignored_dirs))]
+    printed_items_count = 0
 
-    for idx, item in enumerate(target_dir.iterdir()):
+    for idx, item in enumerate(items):
         relative_item = item.relative_to(target_dir)
         
         if item.is_dir():
@@ -72,19 +76,21 @@ def print_directory_structure_tree(target_dir, ignore_patterns, parent_dir='', p
 
         if is_ignored(item, ignore_patterns):
             if item.is_dir() and show_ignored_dirs: # show ignored dir heads if needed
-                if idx == len(list(target_dir.iterdir())) - 1:
+                if printed_items_count == len(visible_items) - 1:
                     print(f"{prefix}└── {relative_item}")
                 else:
                     print(f"{prefix}├── {relative_item}")
+                printed_items_count += 1
             continue
 
-        if idx == len(list(target_dir.iterdir())) - 1:  # if last item
+        if printed_items_count == len(visible_items) - 1:  # if last item
             print(f"{prefix}└── {relative_item}")
             new_prefix = prefix + "    "
         else:
             print(f"{prefix}├── {relative_item}")
             new_prefix = prefix + "│   "
 
+        printed_items_count += 1
         if item.is_dir():
             print_directory_structure_tree(item, ignore_patterns, parent_dir=os.path.join(parent_dir, str(relative_item)), prefix=new_prefix, show_ignored_dirs=show_ignored_dirs)
 
@@ -99,6 +105,7 @@ def main(target_dir, output_format, manual_ignore_patterns, use_gitignore, show_
         print_directory_structure_list(target_dir, ignore_patterns, show_ignored_dirs=show_ignored_dirs)
     elif output_format == "tree":
         print_directory_structure_tree(target_dir, ignore_patterns, show_ignored_dirs=show_ignored_dirs)
+    print()
 
 
 if __name__ == "__main__":
