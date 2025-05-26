@@ -29,8 +29,8 @@ def is_ignored(file_path, ignore_patterns):
         if fnmatch.fnmatch(file_path.name, pattern):
             return True
         
-        if pattern.endswith('/') and file_path.is_dir():
-            if fnmatch.fnmatch(file_path.name + '/', pattern):
+        if pattern.endswith(os.sep) and file_path.is_dir():
+            if fnmatch.fnmatch(file_path.name + os.sep, pattern):
                 return True
     return False
 
@@ -45,7 +45,7 @@ def print_directory_structure_list(target_dir, ignore_patterns, parent_dir='', h
         relative_item = item.relative_to(target_dir)
 
         if item.is_dir():
-            relative_item = relative_item.as_posix() + '/'
+            relative_item = relative_item.as_posix() + os.sep
                     
         if is_ignored(item, ignore_patterns):
             if item.is_dir() and not hide_ignored_dirs: # show ignored dir heads if needed
@@ -72,7 +72,7 @@ def print_directory_structure_tree(target_dir, ignore_patterns, parent_dir='', p
         relative_item = item.relative_to(target_dir)
         
         if item.is_dir():
-            relative_item = relative_item.as_posix() + '/'
+            relative_item = relative_item.as_posix() + os.sep
 
         if is_ignored(item, ignore_patterns):
             if item.is_dir() and not hide_ignored_dirs: # show ignored dir heads if needed
@@ -101,6 +101,7 @@ def main(target_dir, output_format, manual_ignore_patterns, use_gitignore, hide_
     if manual_ignore_patterns:
         ignore_patterns.extend(manual_ignore_patterns)
     
+    print(target_dir.split(os.sep)[-1] + f"{os.sep}")
     if output_format == "list":
         print_directory_structure_list(target_dir, ignore_patterns, hide_ignored_dirs=hide_ignored_dirs)
     elif output_format == "tree":
